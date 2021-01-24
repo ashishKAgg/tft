@@ -86,8 +86,7 @@ def main(expt_name,
 
   print("Loading & splitting data...")
   raw_data = pd.read_csv(data_csv_path)#, index_col=0)
-  print("Raw:")
-  print(raw_data)
+
   train, valid, test = data_formatter.split_data(raw_data)
   train_samples, valid_samples = data_formatter.get_num_samples_for_calibration(
   )
@@ -145,6 +144,8 @@ def main(expt_name,
   with tf.Graph().as_default(), tf.Session(config=tf_config) as sess:
     tf.keras.backend.set_session(sess)
     best_params = opt_manager.get_best_params()
+    print("best params")
+    print(best_params)
     model = ModelClass(best_params, use_cudnn=False)
 
     model.load(opt_manager.hyperparam_folder)
@@ -155,6 +156,8 @@ def main(expt_name,
     print("Computing test loss")
     output_map = model.predict(test, return_targets=True)
     targets = data_formatter.format_predictions(output_map["targets"])
+    print("Targets:::::")
+    print(targets)
     p50_forecast = data_formatter.format_predictions(output_map["p50"])
     p90_forecast = data_formatter.format_predictions(output_map["p90"])
 

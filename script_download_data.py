@@ -51,6 +51,8 @@ import pandas as pd
 import pyunpack
 import wget
 
+from talib.abstract import *
+import talib
 
 # General functions for data downloading & aggregation.
 def download_from_url(url, output_path):
@@ -186,7 +188,96 @@ def download_volatility(config):
 
   print('Done.')
 
+# Dataset specific download routines.
+def process_stock(config):
+  """Process stock data from local path."""
+  csv_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'stock_dataset')
+  csv_path = os.path.join(csv_folder, 'banknifty_all_1min.csv')
+  df = pd.read_csv(csv_path)  # no explicit index
 
+  #Add Symbol Column
+  df["Symbol"] = "BankNifty"
+	
+  #Adds additional date/day fields
+  dates = pd.to_datetime(df["t"], format="%Y-%m-%dT%H:%M:%S%z")
+  df['hour'] = dates.dt.hour
+  df['dayofweek'] = dates.dt.dayofweek
+  df['week'] = dates.dt.week
+  df['weekday'] = dates.dt.weekday
+  df['weekofyear'] = dates.dt.weekofyear
+  df['month'] = dates.dt.month
+  df["year"] = dates.dt.year
+  df["time"] = dates.dt.time
+  df["day"] = dates.dt.day
+  df['categorical_id'] = df['Symbol'].copy()
+  
+  #Add Talib features
+  def add_talib_features(high, low, close_val):
+    df["natr"] = NATR(high, low, close_val, timeperiod=10)
+    df["atr"] = ATR(high, low, close_val, timeperiod=10)
+    df["rsi"] = RSI(close_val, timeperiod=14)
+    df["macd"], df["macdsignal"], macdhist = MACD(close_val, fastperiod=12, slowperiod=26, signalperiod=9)
+    df["tsf"] = TSF(close_val, timeperiod=14)
+    df["dema"] = DEMA(close_val, timeperiod=21)
+
+  add_talib_features(df['h'], df['l'], df['c'])
+	
+  #Transform to log values
+  df[["o", "l", "h", "c"]] = np.log(df[["o", "l", "h", "c"]])
+	
+	
+  # Adds static information
+  symbol_region_mapping = {
+      '.AEX': 'EMEA',
+      '.AORD': 'APAC',
+      '.BFX': 'EMEA',
+      '.BSESN': 'APAC',
+      '.BVLG': 'EMEA',
+      '.BVSP': 'AMER',
+      '.DJI': 'AMER',
+      '.FCHI': 'EMEA',
+      '.FTMIB': 'EMEA',
+      '.FTSE': 'EMEA',
+      '.GDAXI': 'EMEA',
+      '.GSPTSE': 'AMER',
+      '.HSI': 'APAC',
+      '.IBEX': 'EMEA',
+      '.IXIC': 'AMER',
+      '.KS11': 'APAC',
+      '.KSE': 'APAC',
+      '.MXX': 'AMER',
+      '.N225': 'APAC ',
+      '.NSEI': 'APAC',
+      '.OMXC20': 'EMEA',
+      '.OMXHPI': 'EMEA',
+      '.OMXSPI': 'EMEA',
+      '.OSEAX': 'EMEA',
+      '.RUT': 'EMEA',
+      '.SMSI': 'EMEA',
+      '.SPX': 'AMER',
+      '.SSEC': 'APAC',
+      '.SSMI': 'EMEA',
+      '.STI': 'APAC',
+      '.STOXX50E': 'EMEA'
+  }
+
+  df['Region'] = 'APAC'
+
+  #Drop NaN values, reset index
+  df.dropna(inplace=True)
+  df.reset_index(inplace=True, drop=True)
+    
+  # Performs final processing
+  #Sort values on timestamp column
+  df.sort_values("t", inplace=True)
+  
+  output_file = config.data_csv_path
+  print('Completed formatting, saving to {}'.format(output_file))
+  df.to_csv(output_file, index=False)
+
+  print('Done.')
+  
+  
 def download_electricity(config):
   """Downloads electricity dataset from UCI repository."""
 
@@ -591,7 +682,8 @@ def main(expt_name, force_download, output_folder):
       'volatility': download_volatility,
       'electricity': download_electricity,
       'traffic': download_traffic,
-      'favorita': process_favorita
+      'favorita': process_favorita,
+      'stock': process_stock
   }
 
   if expt_name not in download_functions:

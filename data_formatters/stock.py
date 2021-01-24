@@ -42,15 +42,21 @@ class StockFormatter(GenericDataFormatter):
       ('t', DataTypes.DATE, InputTypes.TIME),
       ('c', DataTypes.REAL_VALUED, InputTypes.TARGET),
       ('o', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
-      ('l', DataTypes.REAL_VALUED, InputTypes.KNOWN_INPUT),
-      ('h', DataTypes.REAL_VALUED, InputTypes.KNOWN_INPUT),
-      ('diff', DataTypes.REAL_VALUED, InputTypes.KNOWN_INPUT),
+      ('l', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+      ('h', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+      ('natr', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+      ('atr', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+      ('rsi', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+      ('macd', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+      ('macdsignal', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+      ('dema', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+      ('tsf', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
       ('hour', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
-      #('week', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
+      ('week', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
       ('weekday', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
       ('dayofweek', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
-      #('date', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
-      #('weekofyear', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
+      ('day', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
+      ('weekofyear', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
       ('month', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
       ('Region', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT)
   ]
@@ -88,7 +94,6 @@ class StockFormatter(GenericDataFormatter):
     valid = df.loc[train_index+1: test_index]
     test = df.loc[test_index+1:]
 		
-    print("Train:")
     print(train)
     self.set_scalers(train)
 
@@ -200,9 +205,9 @@ class StockFormatter(GenericDataFormatter):
     """Returns fixed model parameters for experiments."""
 
     fixed_params = {
-        'total_time_steps': 252 + 5,
-        'num_encoder_steps': 252,
-        'num_epochs': 20, #100
+        'total_time_steps': 360 + 5,
+        'num_encoder_steps': 360,
+        'num_epochs': 100,
         'early_stopping_patience': 5,
         'multiprocessing_workers': 5,
     }

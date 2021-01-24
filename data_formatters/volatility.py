@@ -35,6 +35,11 @@ class VolatilityFormatter(GenericDataFormatter):
     column_definition: Defines input and data type of column used in the
       experiment.
     identifiers: Entity identifiers used in experiments.
+    Observed Inputs: Inputs, those future values can't be 
+    			calculated and only known at that instant of time. Like: Open, close, high, low prices
+    Known inputs: those can be calculated for future time. Like month, day, year etc.
+    Static Inputs: those don't change with Time. Time invariate and fixed. Like Region etc.
+    ID: it can be useful when Input data contains multiple Stocks/Index data. Like Symbol  
   """
 
   _column_definition = [
