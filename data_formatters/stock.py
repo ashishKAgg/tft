@@ -205,11 +205,11 @@ class StockFormatter(GenericDataFormatter):
     """Returns fixed model parameters for experiments."""
 
     fixed_params = {
-        'total_time_steps': 120 + 5,
-        'num_encoder_steps': 120,
+        'total_time_steps': 360 + 5,
+        'num_encoder_steps': 360,
         'num_epochs': 100,
         'early_stopping_patience': 5,
-        'multiprocessing_workers': 5,
+        'multiprocessing_workers': 5
     }
 
     return fixed_params
@@ -218,10 +218,10 @@ class StockFormatter(GenericDataFormatter):
     """Returns default optimised model parameters."""
 
     model_params = {
-        'dropout_rate': 0.3,
+        'dropout_rate': 0.2,
         'hidden_layer_size': 160,
-        'learning_rate': 0.01,
-        'minibatch_size': 64,
+        'learning_rate': 0.0001,
+        'minibatch_size': 256,
         'max_gradient_norm': 0.01,
         'num_heads': 1,
         'stack_size': 1
