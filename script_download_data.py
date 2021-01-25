@@ -192,7 +192,7 @@ def download_volatility(config):
 def process_stock(config):
   """Process stock data from local path."""
   csv_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'stock_dataset')
-  csv_path = os.path.join(csv_folder, 'banknifty_all_1min.csv')
+  csv_path = os.path.join(csv_folder, 'banknifty_all_15min.csv')
   df = pd.read_csv(csv_path)  # no explicit index
 
   #Add Symbol Column
