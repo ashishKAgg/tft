@@ -217,23 +217,23 @@ class StockFormatter(GenericDataFormatter):
   def get_default_model_params(self):
     """Returns default optimised model parameters."""
 
-    #model_params = {
-    #    'dropout_rate': 0.3,
-    #    'hidden_layer_size': 160,
-    #    'learning_rate': 0.01,
-    #    'minibatch_size': 64,
-    #    'max_gradient_norm': 0.01,
-    #    'num_heads': 1,
-    #    'stack_size': 1
-    #}
-    
     model_params = {
-        'dropout_rate': 0.5,
-        'hidden_layer_size': 80,
-        'learning_rate': 0.0001,
-        'minibatch_size': 128,
-        'max_gradient_norm': 1.0,
-        'num_heads': 4,
+        'dropout_rate': 0.3,
+        'hidden_layer_size': 160,
+        'learning_rate': 0.01,
+        'minibatch_size': 64,
+        'max_gradient_norm': 0.01,
+        'num_heads': 1,
         'stack_size': 1
     }
+    
+    #model_params = {
+    #    'dropout_rate': 0.5,
+    #    'hidden_layer_size': 80,
+    #    'learning_rate': 0.0001,
+    #    'minibatch_size': 128,
+    #    'max_gradient_norm': 1.0,
+    #    'num_heads': 4,
+    #    'stack_size': 1
+    #}
     return model_params
