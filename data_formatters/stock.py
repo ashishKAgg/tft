@@ -219,7 +219,7 @@ class StockFormatter(GenericDataFormatter):
 
     model_params = {
         'dropout_rate': 0.2,
-        'hidden_layer_size': 160,
+        'hidden_layer_size': 80,
         'learning_rate': 0.0001,
         'minibatch_size': 256,
         'max_gradient_norm': 0.01,
