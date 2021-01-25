@@ -68,7 +68,7 @@ def main(expt_name, use_gpu, restart_opt, model_folder, hyperparam_iterations,
 
   print("### Running hyperparameter optimization for {} ###".format(expt_name))
   print("Loading & splitting data...")
-  raw_data = pd.read_csv(data_csv_path, index_col=0)
+  raw_data = pd.read_csv(data_csv_path)#, index_col=0)
   train, valid, test = data_formatter.split_data(raw_data)
   train_samples, valid_samples = data_formatter.get_num_samples_for_calibration(
   )
@@ -99,7 +99,7 @@ def main(expt_name, use_gpu, restart_opt, model_folder, hyperparam_iterations,
       tf.keras.backend.set_session(sess)
 
       params = opt_manager.get_next_parameters()
-      model = ModelClass(params, use_cudnn=use_gpu)
+      model = ModelClass(params, use_cudnn=False)
 
       if not model.training_data_cached():
         model.cache_batched_data(train, "train", num_samples=train_samples)
@@ -125,7 +125,7 @@ def main(expt_name, use_gpu, restart_opt, model_folder, hyperparam_iterations,
   with tf.Graph().as_default(), tf.Session(config=tf_config) as sess:
     tf.keras.backend.set_session(sess)
     best_params = opt_manager.get_best_params()
-    model = ModelClass(best_params, use_cudnn=use_gpu)
+    model = ModelClass(best_params, use_cudnn=False)
 
     model.load(opt_manager.hyperparam_folder)
 
