@@ -205,8 +205,8 @@ class StockFormatter(GenericDataFormatter):
     """Returns fixed model parameters for experiments."""
 
     fixed_params = {
-        'total_time_steps': 360 + 5,
-        'num_encoder_steps': 360,
+        'total_time_steps': 120 + 5,
+        'num_encoder_steps': 120,
         'num_epochs': 100,
         'early_stopping_patience': 5,
         'multiprocessing_workers': 5,
