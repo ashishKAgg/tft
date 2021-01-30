@@ -223,7 +223,7 @@ def process_stock(config):
   add_talib_features(df['h'], df['l'], df['c'])
 	
   #Transform to log values
-  df[["o", "l", "h", "c"]] = np.log(df[["o", "l", "h", "c"]])
+  #df[["o", "l", "h", "c"]] = np.log(df[["o", "l", "h", "c"]])
 	
 	
   # Adds static information
