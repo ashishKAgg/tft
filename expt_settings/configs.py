@@ -66,7 +66,8 @@ class ExperimentConfig(object):
     self.data_folder = os.path.join(root_folder, 'data', experiment)
     self.model_folder = os.path.join(root_folder, 'saved_models', experiment)
     self.results_folder = os.path.join(root_folder, 'results', experiment)
-
+    self.test_data_folder = os.path.join(root_folder, 'test_data', experiment)
+    
     # Creates folders if they don't exist
     for relevant_directory in [
         self.root_folder, self.data_folder, self.model_folder,
@@ -87,6 +88,18 @@ class ExperimentConfig(object):
     print("File path:"+str(os.path.join(self.data_folder, csv_map[self.experiment])))
     return os.path.join(self.data_folder, csv_map[self.experiment])
 
+  @property
+  def test_data_csv_path(self):
+    csv_map = {
+        'volatility': 'formatted_omi_vol.csv',
+        'electricity': 'hourly_electricity.csv',
+        'traffic': 'hourly_data.csv',
+        'favorita': 'favorita_consolidated.csv',
+        'stock': 'stock_data.csv'
+    }
+    print("File path:"+str(os.path.join(self.test_data_folder, csv_map[self.experiment])))
+    return os.path.join(self.test_data_folder, csv_map[self.experiment])
+  
   @property
   def hyperparam_iterations(self):
 

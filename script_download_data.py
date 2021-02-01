@@ -53,6 +53,7 @@ import wget
 
 from talib.abstract import *
 import talib
+import pytz
 
 # General functions for data downloading & aggregation.
 def download_from_url(url, output_path):
@@ -192,7 +193,8 @@ def download_volatility(config):
 def process_stock(config):
   """Process stock data from local path."""
   csv_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'stock_dataset')
-  csv_path = os.path.join(csv_folder, 'banknifty_all_15min.csv')
+  csv_path = os.path.join(csv_folder, 'banknifty_80pct_1min.csv')
+  #csv_path = os.path.join(csv_folder, 'testdata_bankNifty_15min.csv')
   df = pd.read_csv(csv_path)  # no explicit index
 
   #Add Symbol Column
@@ -202,14 +204,17 @@ def process_stock(config):
   dates = pd.to_datetime(df["t"], format="%Y-%m-%dT%H:%M:%S%z")
   df['hour'] = dates.dt.hour
   df['dayofweek'] = dates.dt.dayofweek
-  df['week'] = dates.dt.week
+  #df['week'] = dates.dt.week
   df['weekday'] = dates.dt.weekday
-  df['weekofyear'] = dates.dt.weekofyear
+  #df['weekofyear'] = dates.dt.weekofyear
   df['month'] = dates.dt.month
   df["year"] = dates.dt.year
   df["time"] = dates.dt.time
   df["day"] = dates.dt.day
   df['categorical_id'] = df['Symbol'].copy()
+  timeDelta = dates - pd.datetime(2015, 1, 1, tzinfo=pytz.FixedOffset(330))
+  df['minutes_from_start'] = (timeDelta.dt.days * 24 * 60 + timeDelta.dt.seconds / 60)
+  df["t"] = dates
   
   #Add Talib features
   def add_talib_features(high, low, close_val):
@@ -271,6 +276,7 @@ def process_stock(config):
   #Sort values on timestamp column
   df.sort_values("t", inplace=True)
   
+  #output_file = config.test_data_csv_path
   output_file = config.data_csv_path
   print('Completed formatting, saving to {}'.format(output_file))
   df.to_csv(output_file, index=False)

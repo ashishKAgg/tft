@@ -51,12 +51,13 @@ class StockFormatter(GenericDataFormatter):
       ('macdsignal', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
       ('dema', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
       ('tsf', DataTypes.REAL_VALUED, InputTypes.OBSERVED_INPUT),
+      ('minutes_from_start', DataTypes.REAL_VALUED, InputTypes.KNOWN_INPUT),
       ('hour', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
-      ('week', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
+      #('week', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
       ('weekday', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
       ('dayofweek', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
       ('day', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
-      ('weekofyear', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
+      #('weekofyear', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
       ('month', DataTypes.CATEGORICAL, InputTypes.KNOWN_INPUT),
       ('Region', DataTypes.CATEGORICAL, InputTypes.STATIC_INPUT)
   ]
@@ -85,7 +86,9 @@ class StockFormatter(GenericDataFormatter):
     """
 
     print('Formatting train-valid-test splits.')
-
+    #Reduce Memory footprint
+    df = utils.reduce_mem_usage(df)
+    		
     ind = len(df)
     train_index = int((1 - (valid_boundary/100))*ind)
     test_index = int((1 - (test_boundary/100))*ind)
@@ -123,8 +126,8 @@ class StockFormatter(GenericDataFormatter):
 
     data = df[real_inputs].values
     
-    self._real_scalers = sklearn.preprocessing.StandardScaler().fit(data)
-    self._target_scaler = sklearn.preprocessing.StandardScaler().fit(
+    self._real_scalers = sklearn.preprocessing.StandardScaler(with_mean=False, with_std=False).fit(data)
+    self._target_scaler = sklearn.preprocessing.StandardScaler(with_mean=False, with_std=False).fit(
         df[[target_column]].values)  # used for predictions
 
     # Format categorical scalers
@@ -180,6 +183,28 @@ class StockFormatter(GenericDataFormatter):
       output[col] = self._cat_scalers[col].transform(string_df)
 
     return output
+
+  def transform_test_data(self, df):
+    """Method used in prediction to transform Test data into Model Input data.
+
+    This also calibrates scaling object, and transforms data for provided Dataframe.
+
+    Args:
+      df: Source data frame to split.
+
+    Returns:
+      Dataframe of transformed test data.
+    """
+
+    print('Formatting test splits.')
+		#Reduce memory footprint
+    df = utils.reduce_mem_usage(df)
+    print(df)
+    self.set_scalers(df)
+    ret = self.transform_inputs(df)
+    print(ret)
+    return ret
+  
 
   def format_predictions(self, predictions):
     """Reverts any normalisation to give predictions in original scale.
@@ -237,3 +262,5 @@ class StockFormatter(GenericDataFormatter):
     #    'stack_size': 1
     #}
     return model_params
+
+    
