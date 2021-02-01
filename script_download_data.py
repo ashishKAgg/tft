@@ -190,12 +190,22 @@ def download_volatility(config):
   print('Done.')
 
 # Dataset specific download routines.
-def process_stock(config):
+def process_stock(config, data_pct):
   """Process stock data from local path."""
   csv_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'stock_dataset')
-  csv_path = os.path.join(csv_folder, 'banknifty_80pct_1min.csv')
+  csv_path = os.path.join(csv_folder, 'banknifty_all_1min.csv')
   #csv_path = os.path.join(csv_folder, 'testdata_bankNifty_15min.csv')
   df = pd.read_csv(csv_path)  # no explicit index
+
+  #Read partial data
+  df = df.sort_values("t")
+  df.reset_index(drop=True, inplace=True)
+  #data_pct is % of data 
+  df_rec = len(df) * (data_pct/100)
+  print("Percentage of Data used: "+str(data_pct)+"%")
+  print("Records Count:"+str(df_rec))
+  df = df[-int(df_rec):]
+  df.reset_index(drop=True, inplace=True)
 
   #Add Symbol Column
   df["Symbol"] = "BankNifty"
@@ -662,7 +672,7 @@ def process_favorita(config):
 
 
 # Core routine.
-def main(expt_name, force_download, output_folder):
+def main(expt_name, force_download, output_folder, data_pct):
   """Runs main download routine.
 
   Args:
@@ -699,8 +709,11 @@ def main(expt_name, force_download, output_folder):
 
   # Run data download
   print('Getting {} data...'.format(expt_name))
-  download_function(expt_config)
-
+  if expt_name == 'stock':
+    download_function(expt_config, data_pct)
+  else:
+    download_function(expt_config)
+    
   print('Download completed.')
 
 
@@ -727,6 +740,13 @@ if __name__ == '__main__':
         default='.',
         help='Path to folder for data download')
     parser.add_argument(
+        'data_pct',
+        metavar='p',
+        type=str,
+        nargs='?',
+        default='100',
+        help='Percentage of data use for model training')
+    parser.add_argument(
         'force_download',
         metavar='r',
         type=str,
@@ -739,7 +759,7 @@ if __name__ == '__main__':
 
     root_folder = None if args.output_folder == '.' else args.output_folder
 
-    return args.expt_name, args.force_download == 'yes', root_folder
+    return args.expt_name, args.force_download == 'yes', root_folder, int(args.data_pct)
 
-  name, force, folder = get_args()
-  main(expt_name=name, force_download=force, output_folder=folder)
+  name, force, folder, data_pct = get_args()
+  main(expt_name=name, force_download=force, output_folder=folder, data_pct=data_pct)
