@@ -52,6 +52,7 @@ def main(expt_name,
          model_folder,
          data_csv_path,
          data_formatter,
+         enable_scaling,
          use_testing_mode=False):
   """Trains tft based on defined model params.
 
@@ -87,10 +88,11 @@ def main(expt_name,
   print("Loading & splitting data...")
   raw_data = pd.read_csv(data_csv_path)#, index_col=0)
 
-  train, valid, test = data_formatter.split_data(raw_data)
+  train, valid, test = data_formatter.split_data(raw_data, enable_scaling=enable_scaling)
   train_samples, valid_samples = data_formatter.get_num_samples_for_calibration(
   )
-
+  
+  print(train)
   # Sets up default params
   fixed_params = data_formatter.get_experiment_params()
   params = data_formatter.get_default_model_params()
@@ -219,14 +221,22 @@ if __name__ == "__main__":
         choices=["yes", "no"],
         default="no",
         help="Whether to use gpu for training.")
-
+    parser.add_argument(
+        "enable_scaling",
+        metavar="s",
+        type=str,
+        nargs="?",
+        choices=["yes", "no"],
+        default="no",
+        help="Whether to use Standard Scaling Transformation before training.")
+        
     args = parser.parse_known_args()[0]
 
     root_folder = None if args.output_folder == "." else args.output_folder
 
-    return args.expt_name, root_folder, args.use_gpu == "yes"
+    return args.expt_name, root_folder, args.use_gpu == "yes", args.enable_scaling == "yes"
 
-  name, output_folder, use_tensorflow_with_gpu = get_args()
+  name, output_folder, use_tensorflow_with_gpu, enable_scaling = get_args()
 
   print("Using output folder {}".format(output_folder))
 
@@ -240,5 +250,6 @@ if __name__ == "__main__":
       model_folder=os.path.join(config.model_folder, "fixed"),
       data_csv_path=config.data_csv_path,
       data_formatter=formatter,
+      enable_scaling=enable_scaling,
       use_testing_mode=False)
       #use_testing_mode=True)  # Change to false to use original default params

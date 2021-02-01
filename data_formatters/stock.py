@@ -71,7 +71,7 @@ class StockFormatter(GenericDataFormatter):
     self._target_scaler = None
     self._num_classes_per_cat_input = None
 
-  def split_data(self, df, valid_boundary=20, test_boundary=10):
+  def split_data(self, df, valid_boundary=20, test_boundary=10, enable_scaling=True):
     """Splits data frame into training-validation-test data frames.
 
     This also calibrates scaling object, and transforms data for each split.
@@ -97,12 +97,11 @@ class StockFormatter(GenericDataFormatter):
     valid = df.loc[train_index+1: test_index]
     test = df.loc[test_index+1:]
 		
-    print(train)
-    self.set_scalers(train)
+    self.set_scalers(train, enable_scaling)
 
     return (self.transform_inputs(data) for data in [train, valid, test])
 
-  def set_scalers(self, df):
+  def set_scalers(self, df, enable_scaling=True):
     """Calibrates scalers using the data supplied.
 
     Args:
@@ -125,9 +124,9 @@ class StockFormatter(GenericDataFormatter):
         {InputTypes.ID, InputTypes.TIME})
 
     data = df[real_inputs].values
-    
-    self._real_scalers = sklearn.preprocessing.StandardScaler(with_mean=False, with_std=False).fit(data)
-    self._target_scaler = sklearn.preprocessing.StandardScaler(with_mean=False, with_std=False).fit(
+    print("Scaling Enabled:"+str(enable_scaling))
+    self._real_scalers = sklearn.preprocessing.StandardScaler(with_mean=enable_scaling, with_std=enable_scaling).fit(data)
+    self._target_scaler = sklearn.preprocessing.StandardScaler(with_mean=enable_scaling, with_std=enable_scaling).fit(
         df[[target_column]].values)  # used for predictions
 
     # Format categorical scalers
@@ -184,7 +183,7 @@ class StockFormatter(GenericDataFormatter):
 
     return output
 
-  def transform_test_data(self, df):
+  def transform_test_data(self, df, enable_scaling):
     """Method used in prediction to transform Test data into Model Input data.
 
     This also calibrates scaling object, and transforms data for provided Dataframe.
@@ -200,7 +199,7 @@ class StockFormatter(GenericDataFormatter):
 		#Reduce memory footprint
     df = utils.reduce_mem_usage(df)
     print(df)
-    self.set_scalers(df)
+    self.set_scalers(df, enable_scaling)
     ret = self.transform_inputs(df)
     print(ret)
     return ret
@@ -245,7 +244,7 @@ class StockFormatter(GenericDataFormatter):
     model_params = {
         'dropout_rate': 0.2,
         'hidden_layer_size': 80,
-        'learning_rate': 0.0001,
+        'learning_rate': 0.001,
         'minibatch_size': 256,
         'max_gradient_norm': 0.01,
         'num_heads': 1,
