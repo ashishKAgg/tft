@@ -71,7 +71,7 @@ class StockFormatter(GenericDataFormatter):
     self._target_scaler = None
     self._num_classes_per_cat_input = None
 
-  def split_data(self, df, valid_boundary=20, test_boundary=10, enable_scaling=True):
+  def split_data(self, df, valid_boundary=20, test_boundary=10, enable_scaling=False):
     """Splits data frame into training-validation-test data frames.
 
     This also calibrates scaling object, and transforms data for each split.
@@ -101,7 +101,7 @@ class StockFormatter(GenericDataFormatter):
 
     return (self.transform_inputs(data) for data in [train, valid, test])
 
-  def set_scalers(self, df, enable_scaling=True):
+  def set_scalers(self, df, enable_scaling=False):
     """Calibrates scalers using the data supplied.
 
     Args:
